@@ -1,0 +1,29 @@
+﻿@if (cities != null && cities.Count > 0)
+{
+    <div class="container-fluid text-center">
+        <div class="row w-50">
+            @foreach (var city in cities)
+            {
+                <CityComponent City="@city" SelectedCity="@selectedCity" SelectCityCallBack="HandleCitySelection"></CityComponent>
+            }
+        </div>
+    </div>
+}
+@code {
+    private List<String> cities = CitiesRepository.GetCities();
+    private string selectedCity = "Tornoto";
+
+    [Parameter]
+    public EventCallback<string> SelectCityCallBack { get; set; }
+
+    private void HandleCitySelection(string cityName)
+    {
+        selectedCity = cityName;
+        SelectCityCallBack.InvokeAsync(cityName);
+    }
+
+    public void ClearSelection()
+    {
+        this.selectedCity = string.Empty;
+    }
+}

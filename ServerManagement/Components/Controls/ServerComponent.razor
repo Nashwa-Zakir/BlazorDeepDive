@@ -1,0 +1,86 @@
+﻿@inject NavigationManager NavigationManager
+
+@if (Server != null)
+{
+    <tr style="background-color: @GetBackGroundColour()">
+
+        <td>
+            @Server.Name
+        </td>
+        <td>
+            @Server.City
+        </td>
+        <td style="color: @((Server.IsOnline ? "green" : "red"))">
+            @(Server.IsOnline ? "online" : "offline")
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                Random random = new Random();
+                int randomNumber = random.Next(0, 400);
+                <text>@randomNumber</text>
+            }
+            else
+            {
+                <text>N/A</text>
+            }
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                <button type="button" class="btn btn-outline-danger" @onclick="@(() => {Server.IsOnline = false;})">Turn Off</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-outline-success" @onclick="@(() => {Server.IsOnline = true;})">Turn On</button>
+            }
+            &nbsp;
+            <a href="/servers/@Server.Id" class="btn btn-link">Edit</a>
+        </td>
+        <td>
+            <EditForm Model="Server" FormName="@($"form-server-{Server.Id}")" OnValidSubmit="@(() => { DeleteServer(Server.Id); })">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </td>
+    </tr>
+
+}
+@code {
+
+    [Parameter]
+    public Server? Server { get; set; }
+
+    [CascadingParameter(Name = "SelectedCity")]
+    public string? SelectedCity { get; set; }
+
+    public void DeleteServer(int serverId)
+    {
+        if (serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            NavigationManager.NavigateTo("/servers", true);
+        }
+    }
+
+
+    public string GetBackGroundColour()
+    {
+        if (SelectedCity != null)
+        {
+            switch (this.SelectedCity)
+            {
+                case "Toronto": return "powderblue";
+                case "Montreal": return "lightgray";
+                case "Ottawa": return "palegreen";
+                case "Calgary": return "pink";
+                case "Halifax": return "darkgrey";
+                default:
+                    return "white";
+            }
+        }
+        else
+        {
+            return "white";
+        }
+    }
+}
